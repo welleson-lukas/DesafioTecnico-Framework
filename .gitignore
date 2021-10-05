@@ -1,3 +1,4 @@
+migrations/
 
 # Created by https://www.toptal.com/developers/gitignore/api/flask,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=flask,pycharm
@@ -75,7 +76,7 @@ db.sqlite3-journal
 app.db
 .idea/
 .idea
-migrations/
+
 
 # Flask stuff:
 instance/

@@ -18,4 +18,4 @@ login.login_view = 'login'
 
 bootstrap = Bootstrap(app)
 moment = Moment(app)
-from app import routes, models, errors
+from app import routes, models, errors, api
