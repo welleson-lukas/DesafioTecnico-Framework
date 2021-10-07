@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-12" style="text-align: center">
+
+            <h1>{{ post.title }}</h1>
+            <p>{{ moment(post.created_on).format('LLL') }} -
+                <a href="{{ url_for('user', username=post.post_user.username) }}">
+                    {{ post.post_user.username }}
+                </a>
+            </p>
+            {% if image_url %}
+                <img src="{{ image_url }}" width="800px" height="auto">
+            {% endif %}
+
+            <p style="margin-top: 30px">
+                {{ post.content }}
+            </p>
+
+        </div>
+        {% if current_user.is_authenticated %}
+            <div class="col-12">
+            <!-- FORM COMENTARIO -->
+            <div class="card my-4">
+                <h5 class="card-header">New Comment</h5>
+                <div class="card-body">
+                    <form action="/comment/create" method="post">
+                        <div class="form-group">
+                            <textarea name="comment_input" class="form-control" rows="3"></textarea>
+                            <input hidden value="{{ post.id }}" name="post_comment">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if comments %}
+                <h3>Comments:</h3>
+                <br>
+                {% for comment in comments %}
+                    <div class="media mb-4">
+                        <div class="media-body">
+                            <h5 class="mt-0">{{ comment.comment_user.username }}</h5>
+                            <p>
+                                {{ comment.comment }}
+                            </p>
+
+                            {% if comment.comment_user.username == current_user.username %}
+                                <a type="button" href="{{ url_for('comment_delete', pk=comment.id) }}" class="btn btn-danger btn-sm">Delete</a>
+                            {% else %}
+
+                            {% endif %}
+
+                        </div>
+                    </div>
+                    <hr>
+                {% endfor %}
+            {% endif %}
+        {% else %}
+        {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+{% endblock %}

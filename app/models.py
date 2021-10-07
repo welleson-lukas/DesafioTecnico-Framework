@@ -26,16 +26,16 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def __init__(self, username, email, password_hash):
-        self.username = username
-        self.email = email
-        self.password_hash = password_hash
+    # def __init__(self, username, email, password_hash):
+    #     self.username = username
+    #     self.email = email
 
 
 # POSTS
 class Post(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(140))
+    image = db.Column(db.String(255))
     slug = db.Column(db.String(255), unique=True, nullable=True)
     content = db.Column(db.Text)
     created_on = db.Column(db.DateTime, index=True, default=datetime.now, nullable=True)
@@ -45,8 +45,9 @@ class Post(db.Model):
     def __repr__(self):
         return '<Post {}>'.format(self.title)
 
-    def __init__(self, title, content, user_id):
+    def __init__(self, title, image, content, user_id):
         self.title = title
+        self.image = image
         self.content = content
         self.user_id = user_id
 
@@ -79,20 +80,40 @@ class Comment(db.Model):
 # Album
 class Album(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    image = db.Column(db.String(255))
-    name = db.Column(db.String(255))
-    mimetype = db.Column(db.String(100))
+    title = db.Column(db.String(255))
+    slug = db.Column(db.String(255), unique=True, nullable=True)
     created_on = db.Column(db.DateTime, index=True, default=datetime.now, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    images_album = db.relationship('ImageAlbum', cascade="all,delete", backref='images_album', lazy='dynamic')
 
     def __repr__(self):
-        return '<Album {}>'.format(self.user_id)
+        return '<Album {}>'.format(self.name)
 
-    def __init__(self, image, name, mimetype, user_id):
-        self.image = image
-        self.name = name
-        self.mimetype = mimetype
+    def __init__(self, title, user_id):
+        self.title = title
         self.user_id = user_id
+
+    @staticmethod
+    def slugify(target, value, oldvalue, initiator):
+        if value and (not target.slug or value != oldvalue):
+            target.slug = slugify(value)
+
+
+event.listen(Album.title, 'set', Album.slugify, retval=False)
+
+
+class ImageAlbum(db.Model):
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    image = db.Column(db.String(255))
+    created_on = db.Column(db.DateTime, index=True, default=datetime.now, nullable=True)
+    album_id = db.Column(db.Integer, db.ForeignKey('album.id'))
+
+    def __repr__(self):
+        return '<ImageAlbum {}>'.format(self.id)
+
+    def __init__(self, image, album_id):
+        self.image = image
+        self.album_id = album_id
 
 
 @login.user_loader
@@ -120,7 +141,7 @@ comments_schema = CommentSchema(many=True)
 
 class PostSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'title', 'content', 'slug', 'created_on', 'updated_on', 'user_id', 'comments')
+        fields = ('id', 'title', 'image', 'content', 'slug', 'created_on', 'updated_on', 'user_id', 'comments')
 
     comments = ma.Nested(CommentSchema, many=True)
 
@@ -131,8 +152,17 @@ posts_schema = PostSchema(many=True)
 
 class AlbumSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'image', 'name', 'user_id', 'created_on', 'mimetype')
+        fields = ('id', 'title', 'user_id', 'created_on')
 
 
 album_schema = AlbumSchema()
 albums_schema = AlbumSchema(many=True)
+
+
+class ImageAlbumSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'image', 'album_id', 'created_on')
+
+
+image_album_schema = ImageAlbumSchema()
+image_albums_schema = ImageAlbumSchema(many=True)

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-12" style="text-align: center">
+
+            <h1>{{ album.title }}</h1>
+            <p>{{ moment(album.created_on).format('LLL') }} -
+                <a href="{{ url_for('user', username=album.album_user.username) }}">
+                    {{ album.album_user.username }}
+                </a>
+            </p>
+
+
+        </div>
+
+        <div class="col-12">
+            <h1>add images:</h1>
+            <form action="/album/image/create" method="post" enctype="multipart/form-data">
+                {{ csrf_token }}
+                <div class="form-group">
+                    <input id="image" name="image" type="file">
+                    <input hidden value="{{ album.id }}" name="id_album">
+                </div>
+
+                <input name="submit" id="submit" type="submit" value="Send"></input>
+            </form>
+        </div>
+
+        <div class="col-12">
+            <!-- FORM COMENTARIO -->
+
+            {% if images %}
+                <h3 style="margin-top: 30px">Images:</h3>
+                <br>
+                <div style="margin-bottom: 30px" class="row">
+                {% for image in images %}
+
+                    <div class="col-3" style="margin-bottom: 20px">
+                        <div class="card">
+                            <img src="{{ image }}" class="card-img-top" alt="...">
+                            <div class="card-body">
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+{% endblock %}

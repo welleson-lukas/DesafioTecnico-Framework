@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FileField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User, Post, Comment, Album
@@ -32,12 +33,18 @@ class RegistrationForm(FlaskForm):
 
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
+    image = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'gif'])])
     content = TextAreaField('Content', validators=[DataRequired()])
     submit = SubmitField('Save')
 
 
 class AlbumForm(FlaskForm):
-    image = FileField('Image')
+    title = StringField('Title', validators=[DataRequired()])
+    submit = SubmitField('Save')
+
+
+class ImageAlbumForm(FlaskForm):
+    image = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'gif'])])
     submit = SubmitField('Save')
 
 

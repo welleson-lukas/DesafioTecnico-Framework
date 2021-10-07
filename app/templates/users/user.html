@@ -30,7 +30,6 @@
 
                                 {% endif %}
 
-
                             </div>
                         </div>
                     </div>
@@ -42,21 +41,28 @@
     </div>
     <hr>
     <div class="col-12">
-        <h3>Albums <a href="" type="button" class="btn btn-success btn-sm">New album</a></h3>
+        <h3>Albums <a href="{{ url_for('album_create') }}" type="button" class="btn btn-success btn-sm">New album</a>
+        </h3>
         <div class="row">
 
-            {% if albuns %}
+            {% if albums %}
                 {% for album in albums %}
                     <div class="col-3" style="margin-bottom: 20px">
                         <div class="card">
-                            <img src="..." class="card-img-top" alt="...">
                             <div class="card-body">
-                                <h5 class="card-title">{{ post.title }}</h5>
+                                <h5 class="card-title">{{ album.title }}</h5>
                                 <p class="card-text">
-                                    <b>Date:</b> {{ moment(post.created_on).format('LLL') }} <br>
-                                    <b>Author:</b> {{ post.post_user.username }}
+                                    <b>Date:</b> {{ moment(album.created_on).format('LLL') }} <br>
+                                    <b>Author:</b> {{ album.album_user.username }}
                                 </p>
-                                <a href="{{ url_for('post_slug', slug=post.slug) }}" class="btn btn-primary">Read</a>
+                                <a href="{{ url_for('album_slug', slug=album.slug) }}" class="btn btn-primary btn-sm">Open</a>
+
+                                {% if album.album_user.username == current_user.username %}
+                                    <a href="{{ url_for('album_delete', slug=album.slug) }}"
+                                       class="btn btn-danger btn-sm">Delete</a>
+                                {% else %}
+
+                                {% endif %}
                             </div>
                         </div>
                     </div>

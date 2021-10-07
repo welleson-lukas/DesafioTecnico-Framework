@@ -17,7 +17,7 @@ def token_required(f):
             return jsonify({'error': 'unauthorized'}), 403
 
         if not "Bearer" in token:
-            return jsonify({'error': 'invalid token - Bearer'}), 401
+            return jsonify({'error': 'invalid token'}), 401
 
         try:
             token_pure = token.replace("Bearer", "")
@@ -26,7 +26,7 @@ def token_required(f):
             current_user = User.query.filter_by(username=decoded['username']).first()
 
         except:
-            return jsonify({'error': 'invalid token - error ao decode'}), 403
+            return jsonify({'error': 'invalid token'}), 403
 
         return f(current_user, *args, **kwargs)
 

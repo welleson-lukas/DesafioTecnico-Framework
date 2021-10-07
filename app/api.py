@@ -3,7 +3,7 @@ import datetime
 from flask import request, jsonify
 from app import app, db
 from app.models import User, Post, post_schema, posts_schema, comment_schema, Comment, user_schema, comments_schema, \
-    Album, albums_schema
+    Album, albums_schema, ImageAlbum, image_album_schema, image_albums_schema
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.authenticate import token_required
 from flask_expects_json import expects_json
@@ -22,36 +22,41 @@ schema_post = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
-        'content': {'type': 'string'},
-        'user_id': {'type': 'number'}
+        'content': {'type': 'string'}
     },
-    'required': ['title', 'content', 'user_id']
+    'required': ['title', 'content']
 }
 
 schema_comment = {
     'type': 'object',
     'properties': {
         'comment': {'type': 'string'},
-        'post_id': {'type': 'number'},
-        'user_id': {'type': 'number'}
+        'post_id': {'type': 'number'}
     },
-    'required': ['comment', 'post_id', 'user_id']
+    'required': ['comment', 'post_id']
 }
 
 schema_album = {
     'type': 'object',
     'properties': {
-        'image': {'type': 'string'},
-        'user_id': {'type': 'number'}
+        'title': {'type': 'string'}
     },
-    'required': ['user_id']
+
+}
+
+schema_image = {
+    'type': 'object',
+    'properties': {
+        'image': {'type': 'string'},
+        'album_id': {'type': 'number'}
+    },
+    'required': ['image', 'album_id']
 }
 
 
 # USERS
 @app.route('/api/user/register', methods=['POST'])
 @expects_json(schema_user)
-# @token_required
 def create_user():
     data = request.get_json()
 
@@ -97,20 +102,19 @@ def login_user():
 @expects_json(schema_post)
 def create_post(current_user):
     data = request.get_json()
-    print(current_user.username)
 
     qs_post = db.session.query(Post.id).filter_by(title=data['title']).first() is not None
 
     if qs_post:
         return jsonify({'error': 'post already exists'}), 400
 
-    new_post = Post(title=data['title'], content=data['content'], user_id=data['user_id'])
+    new_post = Post(title=data['title'], content=data['content'], user_id=current_user.id, image=data['image'])
 
     db.session.add(new_post)
     db.session.commit()
 
     result = posts_schema.dump(
-        Post.query.filter_by(user_id=data['user_id'])
+        Post.query.filter_by(user_id=current_user.id)
     )
 
     return jsonify(result)
@@ -128,7 +132,7 @@ def get_posts():
 @app.route('/api/post/<pk>', methods=['DELETE'])
 @token_required
 def delete_post(current_user, pk):
-    post = Post.query.filter_by(id=pk).first()
+    post = Post.query.filter_by(id=pk).first_or_404()
     user_id = current_user.id
 
     if user_id != post.user_id:
@@ -147,16 +151,16 @@ def delete_post(current_user, pk):
 @app.route('/api/comment', methods=['POST'])
 @expects_json(schema_comment)
 @token_required
-def create_comment():
+def create_comment(current_user):
     data = request.get_json()
 
-    new_comment = Comment(comment=data['comment'], user_id=data['user_id'], post_id=data['post_id'])
+    new_comment = Comment(comment=data['comment'], user_id=current_user.id, post_id=data['post_id'])
 
     db.session.add(new_comment)
     db.session.commit()
 
     result = comments_schema.dump(
-        Comment.query.filter_by(user_id=data['user_id'])
+        Comment.query.filter_by(user_id=current_user.id)
     )
 
     return jsonify(result)
@@ -165,7 +169,7 @@ def create_comment():
 @app.route('/api/comment/<pk>', methods=['DELETE'])
 @token_required
 def delete_comment(current_user, pk):
-    comment = Comment.query.filter_by(id=pk).first()
+    comment = Comment.query.filter_by(id=pk).first_or_404()
     user_id = current_user.id
 
     if user_id != comment.user_id:
@@ -183,24 +187,26 @@ def delete_comment(current_user, pk):
 # ALBUMS
 @app.route('/api/album', methods=['POST'])
 @expects_json(schema_album)
-def create_album():
+@token_required
+def create_album(current_user):
     data = request.get_json()
 
-    new_album = Album(image=data['image'], user_id=data['user_id'])
+    new_album = Album(title=data['title'], user_id=current_user.id)
 
     db.session.add(new_album)
     db.session.commit()
 
     result = albums_schema.dump(
-        Comment.query.filter_by(user_id=data['user_id'])
+        Album.query.filter_by(user_id=current_user.id)
     )
 
     return jsonify(result)
 
 
 @app.route('/api/album/<pk>', methods=['DELETE'])
-def delete_album(pk):
-    album = Comment.query.filter_by(id=pk).first()
+@token_required
+def delete_album(current_user, pk):
+    album = Album.query.filter_by(id=pk).first()
 
     if not album:
         return jsonify({'message': 'album not found'})
@@ -209,3 +215,36 @@ def delete_album(pk):
     db.session.commit()
 
     return jsonify({'message': 'album removed successfully'})
+
+
+# IMAGES
+@app.route('/api/album/image', methods=['POST'])
+@expects_json(schema_image)
+@token_required
+def create_image(current_user):
+    data = request.get_json()
+
+    new_image = ImageAlbum(image=data['image'], album_id=data['album_id'])
+
+    db.session.add(new_image)
+    db.session.commit()
+
+    result = image_albums_schema.dump(
+        ImageAlbum.query.filter_by(album_id=data['album_id'])
+    )
+
+    return jsonify(result)
+
+
+@app.route('/api/album/image/<pk>', methods=['DELETE'])
+@token_required
+def delete_image(current_user, pk):
+    image = ImageAlbum.query.filter_by(id=pk).first()
+
+    if not image:
+        return jsonify({'message': 'album not found'})
+
+    db.session.delete(image)
+    db.session.commit()
+
+    return jsonify({'message': 'image removed successfully'})
