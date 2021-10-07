@@ -2,5 +2,62 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
+    <hr>
+    <div class="col-12">
+        <div class="row">
+            {% if posts %}
+                <h3>Posts</h3>
+                {% for post in posts %}
+                    <div class="col-3" style="margin-bottom: 20px">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">
+                                    <b>Date:</b> {{ moment(post.created_on).format('LLL') }} <br>
+                                    <b>Author:</b> {{ post.post_user.username }}
+                                </p>
+                                <a href="{{ url_for('post_slug', slug=post.slug) }}" class="btn btn-primary">Read</a>
+                            </div>
+                        </div>
+                    </div>
 
+                {% endfor %}
+            {% else %}
+                <h3>No posts</h3>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="col-12">
+        <div class="row">
+            {% if albuns %}
+                <h3>Albums</h3>
+                {% for album in albums %}
+                    <div class="col-3" style="margin-bottom: 20px">
+                        <div class="card">
+                            <img src="..." class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">
+                                    <b>Date:</b> {{ moment(post.created_on).format('LLL') }} <br>
+                                    <b>Author:</b> {{ post.post_user.username }}
+                                </p>
+                                <a href="{{ url_for('post_slug', slug=post.slug) }}" class="btn btn-primary">Read</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h3>No albums</h3>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
 {% endblock %}

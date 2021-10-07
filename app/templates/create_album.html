@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Register Post</h1>
+    <form action="/album/create" method="post" enctype="multipart/form-data">
+                {{ csrf_token }}
+        {#        {{ form.image }}#}
+        {#        <p>{{ form.submit() }}</p>#}
+
+        <div class="input-group mb-3">
+            <input type="file" name="images" class="form-control" id="inputGroupFile02">
+            <label class="input-group-text" for="inputGroupFile02">Upload</label>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+{% endblock %}

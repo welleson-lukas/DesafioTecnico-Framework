@@ -1,21 +1,23 @@
+import os
+from werkzeug.utils import secure_filename
 from app import app
-from flask import render_template, flash, redirect, url_for
-from app.forms import LoginForm
+from flask import render_template, flash, redirect, url_for, Response
+from app.forms import LoginForm, RegistrationForm, PostForm, AlbumForm
 from flask_login import current_user, login_user
-from app.models import User
+from app.models import User, Post, Album
 from flask_login import logout_user
 from flask_login import login_required
 from flask import request
 from werkzeug.urls import url_parse
 from app import db
-from app.forms import RegistrationForm
 
 
 @app.route('/')
 @app.route('/index')
-@login_required
 def index():
-    return render_template('index.html', title='index')
+    posts = Post.query.limit(12).all()
+    albuns = Album.query.limit(12).all()
+    return render_template('index.html', title='index', posts=posts, albuns=albuns)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -37,6 +39,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -58,11 +61,81 @@ def register():
 
 
 @app.route('/user/<username>')
-@login_required
 def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+    user_p = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(post_user=user_p)
+
+    albuns = Album.query.filter_by(id=2).first()
+
+    return render_template('user.html', user=user_p, posts=posts, albuns=albuns)
+
+
+# POSTS
+@app.route('/post/create', methods=['GET', 'POST'])
+@login_required
+def post_create():
+    form = PostForm()
+    id_user = current_user.id
+    user_username = current_user.username
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, content=form.content.data, user_id=id_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Congratulations, you are now a registered post!')
+        return redirect(url_for('user', username=user_username))
+    return render_template('create_post.html', title='Register Post', form=form)
+
+
+@app.route('/post/<slug>', methods=['GET'])
+def post_slug(slug):
+    post = Post.query.filter_by(slug=slug).first_or_404()
+
+    return render_template('post.html', post=post)
+
+
+@app.route('/post/delete/<slug>', methods=['GET'])
+def post_delete(slug):
+    post = Post.query.filter_by(slug=slug).first_or_404()
+    user_username = current_user.username
+
+    db.session.delete(post)
+    db.session.commit()
+
+    return redirect(url_for('user', username=user_username))
+
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Albums
+@app.route('/album/create', methods=['GET', 'POST'])
+@login_required
+def album_create():
+    usuario = current_user.username
+    print(usuario)
+    if request.method == "POST":
+        if request.files:
+            image = request.files['images']
+            save_path = os.path.join(UPLOAD_FOLDER, secure_filename(image.filename))
+            image.save(save_path)
+
+            # image.save(os.path.join(app.config['UPLOAD_FOLDER'], image.filename))
+
+            filename = secure_filename(image.filename)
+            mimetype = image.mimetype
+
+            print(f'{UPLOAD_FOLDER}/{filename}')
+
+            img = Album(image=image.read(), name=filename, user_id=1, mimetype=mimetype)
+            db.session.add(img)
+            db.session.commit()
+
+        return "upload successfully"
+
+    return render_template('create_album.html', title='Register Album')
+
+
+@app.route('/album/image/<int:id>')
+def view_image(id):
+    img = Album.query.filter_by(id=id).first()
+    return Response(img.image, mimetype=img.mimetype)
