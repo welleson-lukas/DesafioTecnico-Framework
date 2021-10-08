@@ -50,6 +50,7 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/post` informando
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/post/<id>` informando id do post.
 *informar token JWT em authorization, Bearer jwt-token*
 
+
 ### Comentar post - AP
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/comment` informando comentario e id do post.
 *informar token JWT em authorization, Bearer jwt-token*
@@ -64,6 +65,7 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/comment` informa
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/comment/<id>` informando id do comentário.
 *informar token JWT em authorization, Bearer jwt-token*
 
+
 ### Cadastrar álbum - API
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album` informando título.
 *informar token JWT em authorization, Bearer jwt-token*
@@ -77,6 +79,7 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album` informand
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/album/<id>` informando id do álbum.
 *informar token JWT em authorization, Bearer jwt-token*
 
+
 ### Cadastrar imagem de álbum - API
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album/image/create` informando imagem e id álbum.
 *informar token JWT em authorization, Bearer jwt-token* - **realizar upload usando multipart form**
@@ -87,9 +90,10 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album/image/crea
 }
 ```
 
-### Remover album - API
+### Remover imagem de álbum - API
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/album/image/<id>` informando id da imagem.
 *informar token JWT em authorization, _Bearer jwt-token_*
+
 
 ### Acesso a interface WEB
 `http://127.0.0.1:5000/`
