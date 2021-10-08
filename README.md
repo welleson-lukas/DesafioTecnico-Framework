@@ -7,7 +7,7 @@ Blog WEB e API usando Flask, PostgreSQL e Docker.
 
 ## Informações para Teste
 
-Para utilizar o projeto é necessário executar:
+Para utilizar o projeto é necessário executar o comando docker abaixo:
 
 ```
 # docker-compose up
