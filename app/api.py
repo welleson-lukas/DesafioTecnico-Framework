@@ -7,6 +7,8 @@ from app.models import User, Post, post_schema, posts_schema, comment_schema, Co
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.authenticate import token_required
 from flask_expects_json import expects_json
+from .routes import save_img_post
+
 
 schema_user = {
     'type': 'object',
@@ -217,23 +219,26 @@ def delete_album(current_user, pk):
     return jsonify({'message': 'album removed successfully'})
 
 
-# IMAGES
-@app.route('/api/album/image', methods=['POST'])
-@expects_json(schema_image)
+@app.route('/api/album/image/create', methods=['POST'])
 @token_required
-def create_image(current_user):
-    data = request.get_json()
+def image_create_teste(current_user):
+    if request.method == "POST":
+        data = request.form
+        img = request.files
 
-    new_image = ImageAlbum(image=data['image'], album_id=data['album_id'])
+        image_file = save_img_post(img['image'])
+        id_album = data['album_id']
 
-    db.session.add(new_image)
-    db.session.commit()
+        image_alb = ImageAlbum(image=image_file, album_id=id_album)
 
-    result = image_albums_schema.dump(
-        ImageAlbum.query.filter_by(album_id=data['album_id'])
-    )
+        db.session.add(image_alb)
+        db.session.commit()
 
-    return jsonify(result)
+        result = image_albums_schema.dump(
+            ImageAlbum.query.filter_by(album_id=data['album_id'])
+        )
+
+        return jsonify(result)
 
 
 @app.route('/api/album/image/<pk>', methods=['DELETE'])

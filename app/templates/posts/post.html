@@ -21,21 +21,24 @@
             </p>
 
         </div>
-        {% if current_user.is_authenticated %}
-            <div class="col-12">
+
+        <div class="col-12">
             <!-- FORM COMENTARIO -->
-            <div class="card my-4">
-                <h5 class="card-header">New Comment</h5>
-                <div class="card-body">
-                    <form action="/comment/create" method="post">
-                        <div class="form-group">
-                            <textarea name="comment_input" class="form-control" rows="3"></textarea>
-                            <input hidden value="{{ post.id }}" name="post_comment">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Send</button>
-                    </form>
+            {% if current_user.is_authenticated %}
+                <div class="card my-4">
+                    <h5 class="card-header">New Comment</h5>
+                    <div class="card-body">
+                        <form action="/comment/create" method="post">
+                            <div class="form-group">
+                                <textarea name="comment_input" class="form-control" rows="3"></textarea>
+                                <input hidden value="{{ post.id }}" name="post_comment">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            {% else %}
+            {% endif %}
 
             {% if comments %}
                 <h3>Comments:</h3>
@@ -49,7 +52,8 @@
                             </p>
 
                             {% if comment.comment_user.username == current_user.username %}
-                                <a type="button" href="{{ url_for('comment_delete', pk=comment.id) }}" class="btn btn-danger btn-sm">Delete</a>
+                                <a type="button" href="{{ url_for('comment_delete', pk=comment.id) }}"
+                                   class="btn btn-danger btn-sm">Delete</a>
                             {% else %}
 
                             {% endif %}
@@ -59,8 +63,7 @@
                     <hr>
                 {% endfor %}
             {% endif %}
-        {% else %}
-        {% endif %}
+
         </div>
     </div>
 

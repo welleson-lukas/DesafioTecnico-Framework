@@ -2,7 +2,7 @@
 
 ## Resumo do projeto
 
-API para um catálogo de profissionais usando Django, PostgreSQL e Docker.
+Blog WEB e API usando Flask, PostgreSQL e Docker.
 
 
 ## Informações para Teste
@@ -10,7 +10,7 @@ API para um catálogo de profissionais usando Django, PostgreSQL e Docker.
 Para utilizar o projeto é necessário executar:
 
 ```
-# docker-compose -up
+# docker-compose up
 ```
 
 
@@ -37,7 +37,7 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/user/login` info
 
 ### Cadastrar post - AP
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/post` informando título, conteúdo e imagem.
-*informar token JWT em authorization, _Bearer jwt-token_*
+*informar token JWT em authorization, Bearer jwt-token*
 ```
 {
 	"title": "titulo do post",
@@ -48,11 +48,11 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/post` informando
 
 ### Remover post - AP
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/post/<id>` informando id do post.
-*informar token JWT em authorization, _Bearer jwt-token_*
+*informar token JWT em authorization, Bearer jwt-token*
 
 ### Comentar post - AP
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/comment` informando comentario e id do post.
-*informar token JWT em authorization, _Bearer jwt-token_*
+*informar token JWT em authorization, Bearer jwt-token*
 ```
 {
 	"comment": "Comentário de um post",
@@ -62,11 +62,11 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/comment` informa
 
 ### Remover comentário post - API
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/comment/<id>` informando id do comentário.
-*informar token JWT em authorization, _Bearer jwt-token_*
+*informar token JWT em authorization, Bearer jwt-token*
 
 ### Cadastrar álbum - API
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album` informando título.
-*informar token JWT em authorization, _Bearer jwt-token_*
+*informar token JWT em authorization, Bearer jwt-token*
 ```
 {
 	"title": "titulo do post"
@@ -75,14 +75,14 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album` informand
 
 ### Remover álbum - API
 Utilize o método `DELETE` para a url: `http://127.0.0.1:5000/api/album/<id>` informando id do álbum.
-*informar token JWT em authorization, _Bearer jwt-token_*
+*informar token JWT em authorization, Bearer jwt-token*
 
 ### Cadastrar imagem de álbum - API
-Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album/image` informando imagem e id álbum.
-*informar token JWT em authorization, _Bearer jwt-token_*
+Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album/image/create` informando imagem e id álbum.
+*informar token JWT em authorization, Bearer jwt-token* - **realizar upload usando multipart form**
 ```
 {
-	"image": "novo album",
+	"image": "upload",
 	"album_id": 1
 }
 ```
