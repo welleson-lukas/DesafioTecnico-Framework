@@ -101,16 +101,18 @@ def login_user():
 # POSTS
 @app.route('/api/post', methods=['POST'])
 @token_required
-@expects_json(schema_post)
 def create_post(current_user):
-    data = request.get_json()
 
+    data = request.form
     qs_post = db.session.query(Post.id).filter_by(title=data['title']).first() is not None
+
+    img = request.files
+    image_file = save_img_post(img['image'])
 
     if qs_post:
         return jsonify({'error': 'post already exists'}), 400
 
-    new_post = Post(title=data['title'], content=data['content'], user_id=current_user.id, image=data['image'])
+    new_post = Post(title=data['title'], content=data['content'], user_id=current_user.id, image=image_file)
 
     db.session.add(new_post)
     db.session.commit()
@@ -221,7 +223,7 @@ def delete_album(current_user, pk):
 
 @app.route('/api/album/image/create', methods=['POST'])
 @token_required
-def image_create_teste(current_user):
+def image_create_upload(current_user):
     if request.method == "POST":
         data = request.form
         img = request.files

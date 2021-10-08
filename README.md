@@ -37,12 +37,12 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/user/login` info
 
 ### Cadastrar post - AP
 Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/post` informando título, conteúdo e imagem.
-*informar token JWT em authorization, Bearer jwt-token*
+*informar token JWT em authorization, Bearer jwt-token* - **realizar upload usando multipart form**
 ```
 {
 	"title": "titulo do post",
 	"content": "conteúdo do post",
-	"image": null
+	"image": "upload com multipart form"
 }
 ```
 
@@ -82,7 +82,7 @@ Utilize o método `POST` para a url: `http://127.0.0.1:5000/api/album/image/crea
 *informar token JWT em authorization, Bearer jwt-token* - **realizar upload usando multipart form**
 ```
 {
-	"image": "upload",
+	"image": "upload com multipart form",
 	"album_id": 1
 }
 ```
